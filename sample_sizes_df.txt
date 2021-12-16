@@ -1,0 +1,3 @@
+first samples are train followed by test
+train size: 733
+test size: 184
