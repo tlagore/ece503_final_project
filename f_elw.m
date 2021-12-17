@@ -1,9 +1,7 @@
 % f_elw.m
-% Tyrone Lagore V00995698
+% Tyrone Lagore
 % regularized log cost gradient
-function f = f_elw(wh, D, mu) 
-    % e = exp(1);
-    
+function f = f_elw(wh, D, mu)  
     [num_rows, num_samples] = size(D);
     
     X = D(1:num_rows-1,:);
@@ -14,7 +12,6 @@ function f = f_elw(wh, D, mu)
     
     Xy = X.*y;
     regularizer = (mu/2) * (wh'*wh);
-    % f = sum((log(1 + e.^(-Xy'*wh)) / P)) + regularizer;
     
     f = sum(log(1+exp(-Xy'*wh)))/P + regularizer;
 end

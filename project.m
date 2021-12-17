@@ -1,4 +1,9 @@
+[Xtr, y_tr, Xte, y_te] = lr_train_and_predict('heart_cleaned_filled_scaled.csv');
+
+% less optimal versions of cleaning:
 [Xtr, y_tr, Xte, y_te] = lr_train_and_predict('heart_cleaned_filled.csv');
+[Xtr, y_tr, Xte, y_te] = lr_train_and_predict('heart_cleaned_df.csv');
+[Xtr, y_tr, Xte, y_te] = lr_train_and_predict('heart_cleaned_ds.csv');
 
 function [Xtr, y_tr, Xte, y_te] =  lr_train_and_predict(file_name)
     [Xtr, y_tr, Xte, y_te, num_features] = load_and_prepare_lr_data(file_name);
