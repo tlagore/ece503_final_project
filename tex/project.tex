@@ -36,18 +36,18 @@ tyronelagore@uvic.ca \\V00995698}
 \pagestyle{plain}
 % \setlength{\parskip}{0.1cm plus4mm minus3mm}
 \begin{abstract}
-The WHO states that the leading cause of death globally is cardiovascular disease \cite{who}. It is important to diagnose heart disease early on, as management of the condition often includes life changes and medications that work as preventative measures. If a patient does not address the condition in time, it may lead to heart attack or other cardiovascular complications that require immediate medical intervention, and also have high mortality rates. Using a dataset acquired through \texit{Kaggle} that supplies various patient information and an identifier specifying weather or not the patient has underlying heart disease \cite{kaggle}, optimization techniques will be used to train a binary classification machine learning model on the data such that the model can be used to predict whether new unseen patients may have underlying heart disease. Various gradient descent methods will be compared to attempt to find an optimal model for this particular problem.
+The WHO states that the leading cause of death globally is cardiovascular disease \cite{who}. It is important to diagnose heart disease early on, as management of the condition often includes life changes and medications that work as preventative measures. If a patient does not address the condition in time, it may lead to heart attack or other cardiovascular complications that require immediate medical intervention, and also have high mortality rates. Using a dataset acquired through \texit{Kaggle} that supplies various patient information and an identifier specifying weather or not the patient has underlying heart disease \cite{kaggle}, optimization techniques will be used to train a binary classification machine learning model on the data such that the model can be used to predict whether new unseen patients may have underlying heart disease. Various optimization methods will be compared to attempt to find an optimal model for this particular problem.
 \end{abstract}
 
 \section{Introduction}
 \subsection{Heart Disease}
 Heart disease is one of the leading causes of death worldwide. Having an estimated 17.9 million people having died in 2019, heart disease related deaths represents 32\% of all deaths worldwide \cite{who}. It is also a condition that is much better addressed through prevention. Should the disease progress to the point that a patient must seek medical attention, then it will be much more serious than if the patient had the condition diagnosed earlier on. 
 
-Given a dataset obtained on Kaggle \cite{kaggle}, with various patient descriptors, several machine learning models will be trained in an attempt to create a binary classifier that can predict whether or not new unseen patients are at risk for having heart disease. Several gradient descent methods and one Newton method will be compared against one another to gauge the performance and select the best model.
+Given a dataset obtained on Kaggle \cite{kaggle}, with various patient descriptors, several machine learning models will be trained in an attempt to create a binary classifier that can predict whether or not new unseen patients are at risk for having heart disease. In this paper, Conjugate Gradient Descent, Broyden-Fletcher-Goldfarb-Shanno (BFGS), Memoryless BFGS, and Newton algorithm will be compared against one another to gauge the performance and select the best model.
 
 \section{Data}
 \subsection{Understanding the Features}
-The dataset 918 samples, each sample has 11 features with 1 label depicting whether or not the patient has heart disease. The sample features are labeled as $X$ and assigned as $\begin{bmatrix}x_1, x_2, ... x_{918}\end{bmatrix} \in \mathbb{R}^{11\times 918}$, the label is assigned as $y \in \mathbb{R}^{918x1}$.
+The dataset is composed of 918 samples, each sample has 11 features with 1 label depicting whether or not the patient has heart disease. The sample features are depicted by $X$ and assigned as $\begin{bmatrix}x_1& x_2&...&x_{918}\end{bmatrix}^{11\times 918}$, the label is depicted by $y \in \{0,1\}^{918x1}$.
 
 The 11 features and label can be described as seen in table \ref{tab:features}. Sex, ChestPainType, RestingECG, ExerciseAngina, and ST\_Slope are all categorical features and will need to be converted to numerical values before proceeding with training the models. 
  
@@ -113,7 +113,8 @@ The 11 features and label can be described as seen in table \ref{tab:features}. 
 
 It can be seen in table \ref{tab:numerical-features} that the values for the numerical features vary quite substantially. Some, such as FastingBS is between 0 and 1, whereas Cholesterol goes form 0 to 603. Furthermore, the presence of 0 in a field like RestingBP and Cholesterol most likely indicates that some of the samples are missing this feature information. It will be desirable to ensure that the features are scaled to be more in line with one another in order to ensure that the model can be trained effectively. This will be discussed more in section \ref{CleaningData}.
 
-\subsection{Visualizing the Data}
+\subsection{Visualizing and Cleaning the Data}
+\label{CleaningData}
 Several of the fields are categorical, which must be translated to a numerical value before training the model. However, depending on the cleanliness of the dataset, some of the categories may have needlessly many categories. This could cause some categorical features to have samples that have a very small number of a certain type of category.
 
 It is important to visualize the categorical fields to see if there are any categories that are vastly underrepresented. If they appear in small enough quantities, it may be acceptable to remove the samples from the dataset. The visualization of the categorical features can be seen in fig. \ref{fig:categories}. It does not seem that any of the categories have needlessly few representations in the samples, so it should be acceptable to keep every category of every categorical feature.
@@ -123,15 +124,13 @@ It is important to visualize the categorical fields to see if there are any cate
 \caption{\label{fig:categories}Visualization of Categorical Features}
 \end{figure*}
 
-\subsection{Cleaning the Data}
-\label{CleaningData}
 \subsubsection{Categorical Features} 
-To handle the categorical features, they must be converted to be numerical. One such method we can achieve this is through "One-Hot Encoding" the categories. We can transform one categorical feature into $n$ different features, one for each of the unique features in that category. Each new feature will be "one-hot" if the sample belonged to that category. For example, if a categorical feature $C^1$ had unique categories $\{c_1, c_2, ..., c_n\} \in C^1$, then we would add $n$ new features $\{C^1_{c1} C^1_{c2}, ..., C^1_{cn}\}$ and an individual sample that had category $c_i$ would then have the values for these features as
+To handle the categorical features, they must be converted to be numerical. One such method we can achieve this is through \say{One-Hot Encoding} the categories. We can transform one categorical feature into $n$ different features, one for each of the unique features in that category. Each new feature will be \say{one-hot} if the sample belonged to that category. For example, if a categorical feature $C^1$ had unique categories $\{c_1, c_2, ..., c_n\} \in C^1$, then we would add $n$ new features $\{C^1_{c1} C^1_{c2}, ..., C^1_{cn}\}$ and an individual sample that had category $c_i$ would then have the values for these features as
 $$\begin{bmatrix}C^1_{c1}\\...\\C^1_{ci}\\...\\C^1_{cn}\end{bmatrix}^T = \begin{bmatrix}0\\...\\1\\...\\0\end{bmatrix}^T $$
 
 As such, ChestPainType will be converted to a $1\times 4$ one-hot encoded feature, Sex $\in 1\times 2$, RestingECG $\in 1\times 3$, ExerciseAngina $\in 1\times 2$, ST\_Slope $\in 1\times 3$. The one-hot encoding transformed the dataset from 11 features with a mix of categorical and numerical features into 20 numerical features.
 
-We can visualize the correlation between features through a heatmap as seen in fig \ref{fig:one-hot-heatmap}
+We can visualize the correlation between features through a heatmap as seen in fig \ref{fig:one-hot-heatmap} before and after one-hot encoding. Doing this allows us to see that certain categories, like the category value of \say{flat} for the ST\_Slope feature being more highly correlated with heart disease.
 
 \begin{figure}%
     \centering
@@ -145,20 +144,18 @@ We can visualize the correlation between features through a heatmap as seen in f
 \subsubsection{Numerical Features}
 There were two numerical features that were missing data, Cholesterol and RestingBP. Since there was only one sample missing the RestingBP information, this sample was simply dropped from the dataset. Cholesterol, however, was missing quite a few samples. It was decided to simply replace the missing cholesterol features with the mean of the existing cholesterol data, as grouped by male and female. 
 
-Instead of just using the mean, a thought was to build a linear regression model that would use the other numerical features to predict the cholesterol level. However, since cholesterol level had a poor correlation with heart disease, more effort was not invested in removing the bias from this decision and the missing values were simply replaced with the mean for male and female respectively.
+Instead of just using the mean, a thought was to build a linear regression model that would use the other numerical features to predict the cholesterol level. However, since cholesterol level had a poor correlation with heart disease, more effort was not invested in removing the bias introduced from making this decision, and the missing values were simply replaced with the mean for male and female respectively.
 
 \subsubsection{Splitting test and Training Data}
-The dataset was then split into training and testing data. 20\% of the data was set aside as test data and the remaining 80\% for testing. The sklearn function \verb|train_test_split| was used to separate the test and training data, stratified on the feature labels (HeartDisease) \cite{sklearn}. 
+The dataset was then split into training and testing data. 20\% of the data was set aside as test data and the remaining 80\% for testing. The sklearn function \verb| train_test_split| was used to separate the test and training data, stratified on the feature labels (HeartDisease) \cite{sklearn}. 
 
 \vspace{0.3cm}
-\begin{minipage}{0.89\linewidth}
-\begin{Verbatim}[numbers=left,framesep=3mm]
+\begin{Verbatim}[framesep=3mm]
 train_test_split(X, y, 
     test_size=0.20, 
     random_state=int(time.time()), 
     stratify=y)
-\end{Verbatim}
-\end{minipage}
+\end{Verbatim} 
 \vspace{0.5cm}
 
 \subsubsection{Scaling the Features}
@@ -172,7 +169,7 @@ Using sklearn's StandardScaler class, we can achieve the above scaling:
 
 \vspace{0.3cm}
 \begin{minipage}{0.89\linewidth}
-\begin{Verbatim}[numbers=left,framesep=3mm]
+\begin{Verbatim}[framesep=3mm]
 from sklearn.preprocessing 
         import StandardScaler
 scaler = StandardScaler()
@@ -192,22 +189,90 @@ X_test[columns_to_scale] =
 
 \section{Training the Models}
 \subsection {Binary Classification}
-The desired output of the model is a simple confirmation of "yes", this sample is at risk for having underlying heart disease, or "no" the sample is not at risk for having underlying heart disease. The task of determining if a sample belongs to one of two classes is a classic binary classification problem. As such, logistic regression will be used to train the models.
-\subsubsection {Loss Function}
-The logistic regression loss function is defined as
-$$\frac{1}{P}\sum_{p=1}^{P} \log\left(\frac{1}{1+e^{-y_p(\^w^Tx_p)}}\right) $$
+\subsubsection{Softmax Loss for Logistic Regression}
+The desired output of the model is a simple confirmation of \say{yes}, this sample is at risk for having underlying heart disease, or \say{no} the sample is not at risk for having underlying heart disease. The task of determining if a sample belongs to one of two classes is a binary classification problem. As such, logistic regression will be used to train the models. The softmax loss function for logistic regression is defined as:
+$$\frac{1}{P}\sum_{p=1}^{P} \log\left(1+e^{-y_p\^w^T\^x_p}\right) $$
 
-Intuitively, we are trying to define a probability that this sample belongs to the class, where $y = 1$ when the sample belongs to this class and $y = -1$ when the sample does not belong to this class. The logistic regression loss function will heavily penalize when the sample is far away from our desired value.
+Where $y_p = 1$ when the sample belongs to this class (patient has underlying heart disease) and $y_p = -1$ when the sample does not belong to this class. Therefore, the labels from the dataset must be changed from $\{0,1\}$ to $\{-1,1\}$. Each $\^x_p$ is constructed as $\begin{bmatrix}x_p&1\end{bmatrix}^T$ and $\^w$ is constructed as $\begin{bmatrix}w&b\end{bmatrix}^T$, where $w$ is the feature touching weights of the model and $b$ is the bias. By minimizing this function with respect to $\^w$, a model can be constructed that allows the classification of a given sample $x_p$. Intuitively, it is trying to define a decision boundary line, $\^w^{*T}\^x_p = 0$, that separates the two classes.  Once the model has been trained and optimal parameters $\^w^*$ are found, the prediction of the model can be obtained with $sign(w^{*T}x_p + b) = sign(\^w^{*T}\^x_p)$. If the prediction is positive, then our model is predicting it belongs to the positive class we are trying to identify, likewise it belongs to the negative class if the prediction is negative. The larger the prediction obtained from $\^w^T\^x_p$, the more confident we are in the classification, as it falls further away from the boundary line as defined above.
 
 A regularization term can be added to the loss function in order to amplify the error of our function.
 
-$$ \frac{1}{P}\sum_{p=1}^{P} \log\left(\frac{1}{1+e^{-y_p(\^w^Tx_p)}}\right) + \frac{\mu}{2}||\^w||_2^2$$
+$$ \frac{1}{P}\sum_{p=1}^{P} \log\left(1+e^{-y_p\^w^T\^x_p}\right) + \frac{\mu}{2}||\^w||_2^2$$
 
-This will cause the model to perform more poorly on training data, but by preventing over-fitting on the training data - the regularization aims to perform better on unseen samples. 
+This will cause the model to perform more poorly on training data, but by preventing over-fitting on the training data - the regularization aims to perform better on unseen samples.
+The matlab code describing this function is as follows
+
+\vspace{0.3cm}
+\begin{Verbatim}[framesep=3mm]
+function f = f_elw(wh, D, mu) 
+    [num_rows, num_samples] = size(D);
+    
+    X = D(1:num_rows-1,:);
+    X = [X; ones(1, num_samples)];
+    y = D(num_rows,:);
+    
+    P = num_samples;
+    
+    Xy = X.*y;
+    regularizer = (mu/2) * (wh'*wh);
+    
+    f = sum(log(1+exp(-Xy'*wh)))/P + regularizer;
+end
+\end{Verbatim} 
+\vspace{0.5cm}
+
+
+\subsubsection{Softmax Gradient} 
+The gradient of the regularized softmax function is given by
+$$ \nabla E_L(\^w) = -\frac{1}{P} \sum_{p=1}^P \frac{y_p \^x_p}{1+e^{y_p\^x^T_p \^w}} + \mu\^w$$
+
+The matlab code describing this function is as follows
+
+\vspace{0.3cm}
+\begin{Verbatim}[framesep=3mm]
+function g = g_elw(wh, D, mu) 
+    e = exp(1);
+    
+    [num_rows, num_samples] = size(D);
+    
+    X = D(1:num_rows-1,:);
+    X = [X; ones(1, num_samples)];
+    y = D(num_rows,:);
+    
+    P = num_samples;
+    
+    regularizer = mu*wh;
+    Xy = X.*y;
+    g = regularizer - (Xy*(1./(1+e.^(Xy'*wh)))/P);   
+end
+\end{Verbatim} 
+\vspace{0.5cm}
+
+\subsubsection{Softmax Hessian} 
+The gradient of the softmax function is given by
+$$ \nabla E_L(\^w) = \frac{1}{P} \sum^P_{p=1} \frac{e^{y_p\^x_p^T\^w}}{\left(1+e^{y_p\^x^T_p \^w}\right)^2} \^x_p\^x_p^T$$
+
+The matlab code describing this function is as follows
+
+\vspace{0.3cm}
+\begin{Verbatim}[framesep=3mm]
+function H = h_LRBC(w,X)
+[N1,P] = size(X);
+q1 = exp(X'*w);
+q = q1./((1+q1).^2);
+H = zeros(N1,N1);
+for p = 1:P
+    xp = X(:,p);
+    H = H + q(p)*(xp*xp');
+end
+H = H/P;
+\end{Verbatim} 
+\vspace{0.5cm}
 
 
 \subsection {Gradient Descent}
-The general form of optimization algorithms can be seen in algorithm \ref{alg:optimization}.
+The general form of optimization algorithms can be seen in algorithm \ref{alg:optimization}. For generic gradient descent, $d_0$ is calculated as $-\nabla f(x_k)$ and $\alpha_k$ is calculated using backtracking line search, as seen in algorithm \ref{alg:line-search}. However, generic gradient descent methods are inherently slow for most functions. This is due to the fact that any two search directions that are successively calculated will be orthogonal to one another. This creates a zig-zag of search directions that is only ever efficient if the condition number of the Hessian of the function is low, that is: the contour of the function is not steep. \cite{course-notes}. Practically speaking, this is rarely the case. As a result, there are many optimized algorithms that can help us to achieve superior performance.
+
 \begin{algorithm}
 \caption{Generic Optimization Algorithm \cite{course-notes}}
 \label{alg:optimization}
@@ -226,8 +291,6 @@ The general form of optimization algorithms can be seen in algorithm \ref{alg:op
 \end{algorithmic}
 \end{algorithm}
 
-For generic gradient descent, $d_0$ is calculated as $-\nabla f(x_k)$ and $\alpha_k$ is calculated using backtracking line search, as seen in algorithm \ref{alg:line-search}
-
 \begin{algorithm}
 \caption{Backtracking Line Search \cite{course-notes}}
 \label{alg:line-search}
@@ -243,22 +306,20 @@ For generic gradient descent, $d_0$ is calculated as $-\nabla f(x_k)$ and $\alph
 \end{algorithmic}
 \end{algorithm}
 
-However, generic gradient descent methods are inherently slow for most functions. This is due to the fact that any two search directions that are successively calculated will be orthogonal to one another. This creates a zig-zag of search directions that is only ever efficient if the condition number of the Hessian of the function is low, that is: the contour of the function is not steep. \cite{course-notes}. Practically speaking, this is rarely the case. As a result, there are many optimized algorithms that can help us to achieve superior performance.
-
 \subsection {Conjugate Gradient Descent (CG)}
 Intuitively, Conjugate Gradient Descent methods attempt to take some information from the previously calculated descent direction. Since they are orthogonal to one another, then some combination of the two descent directions points towards the actual minimizer of the function. As such, the descent direction is calculated slightly differently by first extracting some information about the relation of the consecutive gradients \cite{course-notes}:
 
-$$\beta_k^{PRP} = \frac{\nabla f(x_k)^T \gamma_{k-1}}{||\nabla f(x_{k-1})||^2_2} $$ where
+$$\beta_k^{PRP} = \frac{\nabla f(x_k)^T \gamma_{k-1}}{||\nabla f(x_{k-1})||^2_2},\ \ \ \ \beta_k^{PRP+} = \max{\left(0, \beta_k^{PRP}\right)} $$ where
 $$\gamma_{k-1} = \nabla f(x_k) - \nabla f(x_{k-1})$$
 
-Finally, the descent direction can be calculated using $d_k = -\nabla f(x_k) + \beta_kd_{k-1}$. The accuracy and time to calculate using this algorithm can be seen in table \ref{tab:results}.
+Finally, the descent direction can be calculated using $d_k = -\nabla f(x_k) + \beta^{PRP+}_kd_{k-1}$. The accuracy and time to calculate using this algorithm can be seen in table \ref{tab:results}. The code for this algorithm can be found in Appendix \ref{AppendixB-CG}.
 
 \subsection {Newton Algorithm}
 The Newton algorithm attempts to improve the descent direction by including the quadratic estimation as part of the descent direction. In many scenarios, this can become infeasible due to the size of the dataset, as the Newton algorithm involves calculating the inverse of the Hessian. Considering that the heart disease dataset is small, it is feasible to use the newton algorithm to train our classifier. With the Newton algorithm, the descent direction is calculated as:
 
 $$d_k = -\nabla^2f(x_k)^{-1}\nabla f(x_k)$$
 
-$\alpha$ in the case of the Newton algorithm is always equal to 1, and therefore does not need to be computed using the backtracking line search. The accuracy and time to calculate using this algorithm can be seen in table \ref{tab:results}.
+$\alpha$ in the case of the Newton algorithm is always equal to 1, and therefore does not need to be computed using the backtracking line search. The accuracy and time to calculate using this algorithm can be seen in table \ref{tab:results}. The code for this algorithm can be found in Appendix \ref{AppendixB-Newton}.
 
 \subsection {Broyden-Fletcher-Goldfarb-Shanno (BFGS)}
 The Newton algorithm is not always feasible due to the intensive computation required when performing the inverse of the Hessian. As such, methods have arisen that allow the \textit{approximation} of the Hessian inverse. This is done using only gradient information, iteratively updating some matrix $S_k$ such that it approximates the Hessian inverse. As such, the update direction is the same as the Newton algorithm, replacing the Hessian inverse with
@@ -271,9 +332,10 @@ $$ \delta_k = x_{k+1} - x_{k}, \gamma = \nabla f(x_{k+1}) - \nabla f(x_k) $$
 Then with each iteration, $S_{k+1}$ is calculated as:
 $$ S_k + \left( 1 + \frac{\gamma_k^T S_k \gamma_k}{\gamma_k^T \delta_k} \right) \frac{\delta_k \delta_k^T}{\gamma_k^T\delta_k} - \frac{\delta_k \gamma_k^T S_k + S_k \gamma_k \delta_k^T}{\gamma_k^T\delta_k} $$
 
-See table \ref{tab:results} for the accuracy and time to calculate using the BFGS algorithm.
+See table \ref{tab:results} for the accuracy and time to calculate using the BFGS algorithm. The code for this algorithm can be found in Appendix \ref{AppendixB-BFGS}.
+
 \subsection {Memoryless BFGS}
-Although the BFGS algorithm is excellent for mitigating the computational overhead that the Newton method incurs through the Hessian inverse calculation, it still has a downside. That is, the size of $S_k$ can become increasingly large over time, which can become infeasible to hold in memory on large datasets. the Memoryless BFGS algorithm rewrites the above update rule to compute several inner products.
+Although the BFGS algorithm is excellent for mitigating the computational overhead that the Newton method incurs through the Hessian inverse calculation, it still has a downside. That is, the size of $S_k$ can become increasingly large over time, which can become infeasible to hold in memory on large datasets. The Memoryless BFGS algorithm rewrites the above update rule to compute several inner products.
 
 $$ \rho = \frac{1}{\gamma^T_k \delta_k}, t_k = \delta_k^T \nabla f(x_k+1),$$
 $$and\ q_k = \nabla f(x_{k+1}) - \rho_kt_k\gamma_k$$
@@ -282,7 +344,7 @@ Then the search direction is calculated as
 
 $$ d_{k+1} = \rho_k (\gamma_k^T q_k - t_k ) \delta_k - q_k $$
 
-The heart disease dataset is quite small, so the memory savings provided by this algorithm is inconsequential for this dataset. However, to see how it performs on this data, the model was trained and the results can be seen in table \ref{tab:results}
+The heart disease dataset is quite small, so the memory savings provided by this algorithm is inconsequential for this dataset. However, to see how it performs on this data, the model was trained and the results can be seen in table \ref{tab:results}. The code for this algorithm can be found in Appendix \ref{AppendixB-MLBFGS}.
 
 \section{Results}
 \label{Results}
@@ -303,7 +365,7 @@ The heart disease dataset is quite small, so the memory savings provided by this
     \end{tabular}
 \end{table}
 
-Several iterations were run with different values for $mu$ and table \ref{tab:results} were the $mu$ that had the best accuracy.
+Several iterations were run with different values for $\mu$ and table \ref{tab:results} were the $\mu$ that had the best accuracy.
 Furthermore, the data was cleaned in various ways including:
 \begin{itemize}
     \item \textbf{A}: Not normalizing the data
@@ -330,7 +392,7 @@ Dataset \textbf{D} performed better than any of the other methods of cleaning, t
 Overall, the Newton algorithm was the most effective in terms of accuracy and time taken to calculate. However, this is most likely to do with the size of the dataset allowing for a quick inverse calculation - in addition to the fact that Newton only needed to run for 1 iteration to achieve it's optimal parameters. ML-BFGS and CG methods performed similarly on the dataset, with CG having a slightly faster computation and slightly lower accuracy. Surprisingly, BFGS performed vastly worse than all of the other algorithms.
 
 \section{Discussion}
-Due to the results of the classifiers seen in \nameref{Results}, it seems that there may have been some limiting factors in this dataset that prevented more accurate results. This may have been due to the data not having features that can help to accurately predict heart disease, or more likely the cause is in the preparation of the data for testing. As the data had many different categorical variables, different labeling methods may have produced superior results. The use of one-hot features for every categorical feature created a sparse dataset, that may not have been as ideal in calculating better accuracy parameters. Some additional domain knowledge into what each category represents might give better methods to label them. For example, if ChestPainType represents some type of scale of chest pain that gradually increases, using a label for each category that scales with the chest pain type (1, 2, 3, ...) might have produced superior results. The dataset was also not as large as might be hoped. Having more samples to draw upon, in addition to other features, might produce more effective models. However, at 86.4\% accuracy, the newton model still offers a reasonably accurate classifier.
+Due to the results of the classifiers seen in \nameref{Results}, it seems that there may have been some limiting factors in this dataset that prevented more accurate results. This may have been due to the data not having features that can help to accurately predict heart disease, or the cause is in the preparation of the data for testing. As the data had many different categorical variables, different labeling methods may have produced superior results. The use of one-hot features for every categorical feature created a sparse dataset, that may not have been as ideal in calculating better accuracy parameters. Some additional domain knowledge into what each category represents might give better methods to label them. For example, if ChestPainType represents some type of scale of chest pain that gradually increases, using a label for each category that scales with the chest pain type (1, 2, 3, ...) might have produced superior results. The dataset was also not as large as might be hoped. Having more samples to draw upon, in addition to other features, might produce more effective models. However, at 86.4\% accuracy, the Newton model still offers a reasonably accurate classifier.
 
 In terms of the most effective predictor, Newton not only had the best accuracy - but also had the fewest false negatives. This would be very important in terms of creating a classifier that might be used for recommending patients be tested for heart disease or not. Should the model tell them they do not have concern for underlying heart disease, and they \textbf{do} have underlying heart disease, it would be much worse than telling someone they have heart disease when they do not.
 
@@ -338,6 +400,12 @@ In terms of the most effective predictor, Newton not only had the best accuracy 
 It was interesting to see how the finding of quality data that also had an acceptable quantity was the most difficult part about creating the classifier. The way in which the data is pre-processed vastly changes the quality of the resultant models. While the data was not as high-quality as would have been desired, it is rarely the case that the data conforms exactly to how we would like it to be. As data processing is an essential part of the process, a lot was learned in how to properly prepare the data such that it produces effective models.
 
 The entirety of the code for this project, and the data, can be found in this github repository: \href{https://github.com/tlagore/ece503\_final\_project}{https://github.com/tlagore/ece503\_final\_project}
+
+The main MATLAB driver file is \verb|project.m|
+
+For data cleaning specifics, please view this jupyter-lab notebook:
+\\
+\href{https://github.com/tlagore/ece503\_final\_project/blob/main/clean_heart_data.ipynb}{https://github.com/tlagore/ece503\_final\_project/blob/main/clean\_heart\_data.ipynb}
 
 \begin{thebibliography}{00}
 \bibitem{who} World Health Organization, “Cardiovascular Diseases (CVDs),” who.int, 2021. https://www.who.int/news-room/fact-sheets/detail/cardiovascular-diseases-(cvds).
@@ -347,7 +415,6 @@ The entirety of the code for this project, and the data, can be found in this gi
 \end{thebibliography}
 
 \onecolumn
-
 \begin{appendices}
 \appendix
 \subsection{Matlab Code}
